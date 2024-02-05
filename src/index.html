@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html>
+<body>
+<h1>Analyser</h1>
+<button id="play">Play</button> <button id="stop">Stop</button><br/>
+<table>
+<tr><th>Type</th><td><select id="type"><option value="sine">Sine</option><option value="square">Square</option><option value="sawtooth">SawTooth</option><option value="triangle">Triangle</option></select></td></tr>
+<tr><th>Freq(Hz)</th><td><input type="range" min="50" max="3000" id="freq" value="440"/></td><td id="freqvalue">440</td></tr>
+<tr><th>Level</th><td><input type="range" min="0" max="1" step="0.01" value="0.5" id="level" value="1"/></td><td id="levelvalue">0.5</td></tr>
+<tr><th>Frequency/TimeDomain</th><td><select id="mode"><option>Frequency</option><option>TimeDomain</option></select></td></tr>
+<tr><th>SmoothingTimeConstant</th><td><input  id="smoothing" type="range" min="0" max="1" step="0.01" value="0.9"/></td><td id="smoothingval">0.9</td></tr>
+</table>
+<br/>
+<canvas id="graph" width=512 height=512></canvas>
+<script>
+
+window.addEventListener("load", async ()=>{
+    const audioctx = new AudioContext();
+    let mode = 0;
+    let type = 0;
+    let freq = 440; // 440HzはA4(4番目のラ)
+    let level = 1.0;
+    let oscillator = null;
+    let gain = null;
+    new GainNode(audioctx);
+    const analyser = new AnalyserNode(audioctx, {smoothingTimeConstant:0.9});
+
+    document.getElementById("play").addEventListener("click",()=>{
+        if(audioctx.state=="suspended")
+            audioctx.resume();
+        if(oscillator == null) {
+            oscillator = audioctx.createOscillator();
+            gain = new GainNode(audioctx);
+            if (type == 0) { 
+                oscillator.type = "sine"; // sine, square, sawtooth, triangleがある
+            } else if (type == 1) { 
+                oscillator.type = "square"; // sine, square, sawtooth, triangleがある
+            } else if (type == 2) { 
+                oscillator.type = "sawtooth"; // sine, square, sawtooth, triangleがある
+            } else if (type == 3) { 
+                oscillator.type = "triangle"; // sine, square, sawtooth, triangleがある
+            }
+            oscillator.frequency.setValueAtTime(freq, audioctx.currentTime);
+            gain.gain.value = level;
+            oscillator.connect(gain).connect(analyser).connect(audioctx.destination);
+            oscillator.start();
+            isPlaying = true;
+
+        }
+    });
+    document.getElementById("stop").addEventListener("click",()=>{
+        if(oscillator) oscillator.stop();
+        oscillator = null;
+        gain = null;
+    });
+    document.getElementById("type").addEventListener("change",(ev)=>{
+        type = ev.target.selectedIndex;
+    });
+    document.getElementById("freq").addEventListener("input",(ev)=>{
+        freq = document.getElementById("freqvalue").innerHTML = ev.target.value;
+    });
+    document.getElementById("level").addEventListener("input",(ev)=>{
+        level = document.getElementById("levelvalue").innerHTML = ev.target.value;
+    });
+    document.getElementById("mode").addEventListener("change",(ev)=>{
+        mode = ev.target.selectedIndex;
+    });
+    document.getElementById("smoothing").addEventListener("input",(ev)=>{
+        analyser.smoothingTimeConstant = document.getElementById("smoothingval").innerHTML = ev.target.value;
+    });
+
+    const canvasctx = document.getElementById("graph").getContext("2d");
+    const gradbase = canvasctx.createLinearGradient(0, 0, 0, 512);
+    gradbase.addColorStop(0, "rgb(20,22,20)");
+    gradbase.addColorStop(1, "rgb(20,20,200)");
+    const gradline = [];
+    for(let i = 0; i < 512; ++i) {
+        gradline[i] = canvasctx.createLinearGradient(0, 512 - i, 0, 512);
+        const n = (i & 64) * 2;
+        gradline[i].addColorStop(0, "rgb(255,0,0)");
+        gradline[i].addColorStop(1, "rgb(255," + i + ",0)");
+    }
+    function DrawGraph() {
+        canvasctx.fillStyle = gradbase;
+        canvasctx.fillRect(0, 0, 512, 512);
+        const data = new Uint8Array(512);
+        if(mode == 0) {
+            analyser.getByteFrequencyData(data); //Spectrum Data
+        } else {
+            analyser.getByteTimeDomainData(data); //Waveform Data
+        }
+        for(var i = 0; i < 512; ++i) {
+            canvasctx.fillStyle = gradline[data[i]];
+            canvasctx.fillRect(i, 512 - data[i], 1, data[i]);
+        }
+    }
+    setInterval(DrawGraph, 100);
+});
+</script>
+</body>
+</html>
