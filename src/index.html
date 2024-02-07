@@ -26,19 +26,20 @@ window.addEventListener("load", async ()=>{
     const analyser = new AnalyserNode(audioctx, {smoothingTimeConstant:0.9});
 
     document.getElementById("play").addEventListener("click",()=>{
-        if(audioctx.state=="suspended")
+        if(audioctx.state=="suspended") {
             audioctx.resume();
+        }
         if(oscillator == null) {
             oscillator = audioctx.createOscillator();
             gain = new GainNode(audioctx);
-            if (type == 0) { 
-                oscillator.type = "sine"; // sine, square, sawtooth, triangleがある
-            } else if (type == 1) { 
-                oscillator.type = "square"; // sine, square, sawtooth, triangleがある
-            } else if (type == 2) { 
-                oscillator.type = "sawtooth"; // sine, square, sawtooth, triangleがある
-            } else if (type == 3) { 
-                oscillator.type = "triangle"; // sine, square, sawtooth, triangleがある
+            if (type == 0) {
+                oscillator.type = "sine";
+            } else if (type == 1) {
+                oscillator.type = "square";
+            } else if (type == 2) {
+                oscillator.type = "sawtooth";
+            } else if (type == 3) {
+                oscillator.type = "triangle";
             }
             oscillator.frequency.setValueAtTime(freq, audioctx.currentTime);
             gain.gain.value = level;
@@ -49,7 +50,9 @@ window.addEventListener("load", async ()=>{
         }
     });
     document.getElementById("stop").addEventListener("click",()=>{
-        if(oscillator) oscillator.stop();
+        if(oscillator) {
+            oscillator.stop();
+        }
         oscillator = null;
         gain = null;
     });
@@ -91,7 +94,11 @@ window.addEventListener("load", async ()=>{
         }
         for(var i = 0; i < 512; ++i) {
             canvasctx.fillStyle = gradline[data[i]];
-            canvasctx.fillRect(i, 512 - data[i], 1, data[i]);
+            if (mode == 0) {
+                canvasctx.fillRect(i, 512 + (data[i] * -1.0), 1, data[i]);
+            } else {
+                canvasctx.fillRect(i, 128 + data[i], 10, 10);
+            }
         }
     }
     setInterval(DrawGraph, 100);
