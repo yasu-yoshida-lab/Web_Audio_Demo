@@ -20,7 +20,7 @@ window.addEventListener("load", async ()=>{
     const audioctx = new AudioContext();
     let mode = 0;
     let type = 0;
-    let freq = 440; // 440HzはA4(4番目のラ)
+    let freq = 440;
     let level = 1.0;
     let oscillator = null;
     let gain = null;
@@ -45,6 +45,7 @@ window.addEventListener("load", async ()=>{
             }
             oscillator.frequency.setValueAtTime(freq, audioctx.currentTime);
             gain.gain.value = level;
+            analyser.fftSize = 2048;
             oscillator.connect(gain).connect(filter).connect(analyser).connect(audioctx.destination);
             oscillator.start();
             isPlaying = true;
@@ -95,13 +96,14 @@ window.addEventListener("load", async ()=>{
     function DrawGraph() {
         canvasctx.fillStyle = gradbase;
         canvasctx.fillRect(0, 0, 512, 512);
-        const data = new Uint8Array(512);
+        const times = analyser.fftSize;
+        const data = new Uint8Array(times);
         if(mode == 0) {
             analyser.getByteFrequencyData(data); //Spectrum Data
         } else {
             analyser.getByteTimeDomainData(data); //Waveform Data
         }
-        for(var i = 0; i < 512; ++i) {
+        for(var i = 0; i < times; ++i) {
             canvasctx.fillStyle = gradline[data[i]];
             if (mode == 0) {
                 canvasctx.fillRect(i, 512 + (data[i] * -1.0), 1, data[i]);
@@ -110,7 +112,7 @@ window.addEventListener("load", async ()=>{
             }
         }
     }
-    setInterval(DrawGraph, 100);
+    setInterval(DrawGraph, 1);
 });
 </script>
 </body>
