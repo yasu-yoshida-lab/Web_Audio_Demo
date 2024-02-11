@@ -2,6 +2,9 @@
 <html>
 <body>
 <h1>Analyser</h1>
+<canvas id="graph" width=1024 height=512 style="background-color: #000000
+;"></canvas>
+<br>
 <button id="play">Play</button> <button id="stop">Stop</button><br/>
 <table>
 <tr><th>Type</th><td><select id="type"><option value="sine">Sine</option><option value="square">Square</option><option value="sawtooth">SawTooth</option><option value="triangle">Triangle</option></select></td></tr>
@@ -13,107 +16,6 @@
 <tr><th>Biquad Q</th><td><input type="range" id="biquad_q" min="0" max="50" step="0.1" value="5"/></td><td id="biquad_qval">5</td></tr>
 </table>
 <br/>
-<canvas id="graph" width=512 height=512></canvas>
-<script>
-
-window.addEventListener("load", async ()=>{
-    const audioctx = new AudioContext();
-    let mode = 0;
-    let type = 0;
-    let freq = 440;
-    let level = 1.0;
-    let oscillator = null;
-    let gain = null;
-    const filter = new BiquadFilterNode(audioctx,{frequency:5000, q:5});
-    const analyser = new AnalyserNode(audioctx, {smoothingTimeConstant:0.9});
-
-    document.getElementById("play").addEventListener("click",()=>{
-        if(audioctx.state=="suspended") {
-            audioctx.resume();
-        }
-        if(oscillator == null) {
-            oscillator = audioctx.createOscillator();
-            gain = new GainNode(audioctx);
-            if (type == 0) {
-                oscillator.type = "sine";
-            } else if (type == 1) {
-                oscillator.type = "square";
-            } else if (type == 2) {
-                oscillator.type = "sawtooth";
-            } else if (type == 3) {
-                oscillator.type = "triangle";
-            }
-            oscillator.frequency.setValueAtTime(freq, audioctx.currentTime);
-            gain.gain.value = level;
-            analyser.fftSize = 2048;
-            oscillator.connect(gain).connect(filter).connect(analyser).connect(audioctx.destination);
-            oscillator.start();
-            isPlaying = true;
-
-        }
-    });
-    document.getElementById("stop").addEventListener("click",()=>{
-        if(oscillator) {
-            oscillator.stop();
-        }
-        oscillator = null;
-        gain = null;
-    });
-    document.getElementById("type").addEventListener("change",(ev)=>{
-        type = ev.target.selectedIndex;
-    });
-    document.getElementById("freq").addEventListener("input",(ev)=>{
-        freq = document.getElementById("freqvalue").innerHTML = ev.target.value;
-    });
-    document.getElementById("level").addEventListener("input",(ev)=>{
-        level = document.getElementById("levelvalue").innerHTML = ev.target.value;
-    });
-    document.getElementById("mode").addEventListener("change",(ev)=>{
-        mode = ev.target.selectedIndex;
-    });
-    document.getElementById("smoothing").addEventListener("input",(ev)=>{
-        analyser.smoothingTimeConstant = document.getElementById("smoothingval").innerHTML = ev.target.value;
-    });
-    document.getElementById("biquad_freq").addEventListener("input",(ev)=>{
-        filter.frequency.value = document.getElementById("biquad_freqval").innerHTML = ev.target.value;
-    });
-    document.getElementById("biquad_q").addEventListener("input",(ev)=>{
-        filter.Q.value = document.getElementById("biquad_qval").innerHTML = ev.target.value;
-    });
-
-
-    const canvasctx = document.getElementById("graph").getContext("2d");
-    const gradbase = canvasctx.createLinearGradient(0, 0, 0, 512);
-    gradbase.addColorStop(0, "rgb(20,22,20)");
-    gradbase.addColorStop(1, "rgb(20,20,200)");
-    const gradline = [];
-    for(let i = 0; i < 512; ++i) {
-        gradline[i] = canvasctx.createLinearGradient(0, 512 - i, 0, 512);
-        const n = (i & 64) * 2;
-        gradline[i].addColorStop(0, "rgb(255,0,0)");
-        gradline[i].addColorStop(1, "rgb(255," + i + ",0)");
-    }
-    function DrawGraph() {
-        canvasctx.fillStyle = gradbase;
-        canvasctx.fillRect(0, 0, 512, 512);
-        const times = analyser.fftSize;
-        const data = new Uint8Array(times);
-        if(mode == 0) {
-            analyser.getByteFrequencyData(data); //Spectrum Data
-        } else {
-            analyser.getByteTimeDomainData(data); //Waveform Data
-        }
-        for(var i = 0; i < times; ++i) {
-            canvasctx.fillStyle = gradline[data[i]];
-            if (mode == 0) {
-                canvasctx.fillRect(i, 512 + (data[i] * -1.0), 1, data[i]);
-            } else {
-                canvasctx.fillRect(i, 128 + data[i], 10, 10);
-            }
-        }
-    }
-    setInterval(DrawGraph, 1);
-});
-</script>
+<script src="./main.js"></script>
 </body>
 </html>
