@@ -4,9 +4,11 @@ window.addEventListener("load", async ()=>{
     let type = 0;
     let freq = 440;
     let level = 0.5;
+    let fftsizeindex = 6;
     let oscillator = null;
+    const types = ["sine", "square", "sawtooth", "triangle"];
+    const fftsizes = [32, 64, 128, 256, 512, 1024, 2048];
     const gain = new GainNode(audioctx);
-    const filter = new BiquadFilterNode(audioctx,{frequency:5000, q:5});
     const analyser = new AnalyserNode(audioctx, {smoothingTimeConstant:0.9});
 
     document.getElementById("play").addEventListener("click",()=>{
@@ -15,21 +17,14 @@ window.addEventListener("load", async ()=>{
         }
         if(oscillator == null) {
             oscillator = audioctx.createOscillator();
-            if (type == 0) {
-                oscillator.type = "sine";
-            } else if (type == 1) {
-                oscillator.type = "square";
-            } else if (type == 2) {
-                oscillator.type = "sawtooth";
-            } else if (type == 3) {
-                oscillator.type = "triangle";
-            }
+            oscillator.type = types[type];
             oscillator.frequency.setValueAtTime(freq, audioctx.currentTime);
             gain.gain.value = level;
-            analyser.fftSize = 512;
-            oscillator.connect(gain).connect(filter).connect(analyser).connect(audioctx.destination);
+            analyser.fftSize = fftsizes[fftsizeindex];
+            oscillator.connect(gain).connect(analyser).connect(audioctx.destination);
             oscillator.start();
             isPlaying = true;
+            console.log(fftsizes[fftsizeindex]);
 
         }
     });
@@ -48,19 +43,15 @@ window.addEventListener("load", async ()=>{
     document.getElementById("level").addEventListener("input",(ev)=>{
         level = document.getElementById("levelvalue").innerHTML = ev.target.value;
     });
+    document.getElementById("fftsize").addEventListener("input",(ev)=>{
+        fftsizeindex = ev.target.selectedIndex;
+    });
     document.getElementById("mode").addEventListener("change",(ev)=>{
         mode = ev.target.selectedIndex;
     });
     document.getElementById("smoothing").addEventListener("input",(ev)=>{
         analyser.smoothingTimeConstant = document.getElementById("smoothingval").innerHTML = ev.target.value;
     });
-    document.getElementById("biquad_freq").addEventListener("input",(ev)=>{
-        filter.frequency.value = document.getElementById("biquad_freqval").innerHTML = ev.target.value;
-    });
-    document.getElementById("biquad_q").addEventListener("input",(ev)=>{
-        filter.Q.value = document.getElementById("biquad_qval").innerHTML = ev.target.value;
-    });
-
 
     const canvas = document.getElementById("graph");
     const canvasctx = canvas.getContext("2d");
@@ -69,8 +60,17 @@ window.addEventListener("load", async ()=>{
         const data = new Uint8Array(times);
         const width = canvas.width;
         const height = canvas.height;
+
+        var paddingTop = 20;
+        var paddingBottom = 20;
+        var paddingLeft = 30;
+        var paddingRight = 30;
+
+        var innerWidth = width - paddingLeft - paddingRight;
+        var innerHeight = height - paddingTop - paddingBottom;
+
         // Clear previous data
-        canvasctx.clearRect(0, 0, width, height);
+        canvasctx.clearRect(0, 0, canvas.width, canvas.height);
         // Draw sound wave
         canvasctx.beginPath();
 
@@ -81,8 +81,8 @@ window.addEventListener("load", async ()=>{
         }
 
         for(var i = 0; i < times; ++i) {
-            var x = Math.floor((i / times) * width);
-            var y = Math.floor((1 - (data[i] / 255)) * (height));
+            var x = Math.floor((i / times) * innerWidth) + paddingLeft;
+            var y = Math.floor((1 - (data[i] / 255)) * (innerHeight)) + paddingRight;
             if (i === 0) {
                 canvasctx.moveTo(x, y);
             } else {

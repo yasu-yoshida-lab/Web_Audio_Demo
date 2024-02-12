@@ -2,7 +2,7 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    margin: 10px 0;
+    margin: 10px auto;
 }
 
 canvas {
@@ -13,6 +13,7 @@ canvas {
     display: flex;
     justify-content: center;
     align-items: center;
+    margin: 10px auto;
 }
 
 .controller button {
@@ -23,4 +24,5 @@ canvas {
     display: flex;
     justify-content: center;
     align-items: center;
+    margin: 10px auto;
 }
