@@ -1,21 +1,40 @@
 <!DOCTYPE html>
 <html>
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Web Audio Demo</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="icon" href="mixer.png" type="image/x-icon">
+</head>
+
 <body>
-<h1>Analyser</h1>
-<canvas id="graph" width=1024 height=512 style="background-color: #000000
-;"></canvas>
-<br>
-<button id="play">Play</button> <button id="stop">Stop</button><br/>
-<table>
-<tr><th>Type</th><td><select id="type"><option value="sine">Sine</option><option value="square">Square</option><option value="sawtooth">SawTooth</option><option value="triangle">Triangle</option></select></td></tr>
-<tr><th>Freq(Hz)</th><td><input type="range" min="50" max="3000" id="freq" value="440"/></td><td id="freqvalue">440</td></tr>
-<tr><th>Level</th><td><input type="range" min="0" max="1" step="0.01" value="0.5" id="level" value="1"/></td><td id="levelvalue">0.5</td></tr>
-<tr><th>Frequency/TimeDomain</th><td><select id="mode"><option>Frequency</option><option>TimeDomain</option></select></td></tr>
-<tr><th>SmoothingTimeConstant</th><td><input  id="smoothing" type="range" min="0" max="1" step="0.01" value="0.9"/></td><td id="smoothingval">0.9</td></tr>
-<tr><th>Biquad Frequency</th><td><input type="range" id="biquad_freq" min="0" max="20000" value="440"/></td><td id="biquad_freqval">440</td></tr>
-<tr><th>Biquad Q</th><td><input type="range" id="biquad_q" min="0" max="50" step="0.1" value="5"/></td><td id="biquad_qval">5</td></tr>
-</table>
-<br/>
+
+<div class="canvas-container">
+    <canvas id="graph" width=1024 height=512 style="background-color: #000000
+    ;"></canvas>
+</div>
+
+<div class="controller">
+    <button id="play">Play</button>
+    <button id="stop">Stop</button>
+</div>
+
+<div class="parameter">
+    <table>
+    <tr><th>Type</th><td><select id="type"><option value="sine">Sine</option><option value="square">Square</option><option value="sawtooth">SawTooth</option><option value="triangle">Triangle</option></select></td></tr>
+    <tr><th>Freq(Hz)</th><td><input type="range" min="50" max="3000" id="freq" value="440"/></td><td id="freqvalue">440</td></tr>
+    <tr><th>Level</th><td><input type="range" min="0" max="1" step="0.01" value="0.5" id="level"/></td><td id="levelvalue">0.5</td></tr>
+    <tr><th>Frequency/TimeDomain</th><td><select id="mode"><option>Frequency</option><option>TimeDomain</option></select></td></tr>
+    <tr><th>SmoothingTimeConstant</th><td><input  id="smoothing" type="range" min="0" max="1" step="0.01" value="0.9"/></td><td id="smoothingval">0.9</td></tr>
+    <tr><th>Biquad Frequency</th><td><input type="range" id="biquad_freq" min="0" max="20000" value="440"/></td><td id="biquad_freqval">440</td></tr>
+    <tr><th>Biquad Q</th><td><input type="range" id="biquad_q" min="0" max="50" step="0.1" value="5"/></td><td id="biquad_qval">5</td></tr>
+    </table>
+    <br/>    
+</div>
+
 <script src="./main.js"></script>
 </body>
+
 </html>

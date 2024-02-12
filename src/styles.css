@@ -1,0 +1,26 @@
+﻿.canvas-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 10px 0;
+}
+
+canvas {
+    border: 1px solid black; /* Canvasの境界線を追加する場合 */
+}
+
+.controller {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.controller button {
+    margin: 5px 10px;
+}
+
+.parameter {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}

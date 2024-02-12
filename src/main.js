@@ -3,9 +3,9 @@ window.addEventListener("load", async ()=>{
     let mode = 0;
     let type = 0;
     let freq = 440;
-    let level = 1.0;
+    let level = 0.5;
     let oscillator = null;
-    let gain = null;
+    const gain = new GainNode(audioctx);
     const filter = new BiquadFilterNode(audioctx,{frequency:5000, q:5});
     const analyser = new AnalyserNode(audioctx, {smoothingTimeConstant:0.9});
 
@@ -15,7 +15,6 @@ window.addEventListener("load", async ()=>{
         }
         if(oscillator == null) {
             oscillator = audioctx.createOscillator();
-            gain = new GainNode(audioctx);
             if (type == 0) {
                 oscillator.type = "sine";
             } else if (type == 1) {
@@ -39,7 +38,6 @@ window.addEventListener("load", async ()=>{
             oscillator.stop();
         }
         oscillator = null;
-        gain = null;
     });
     document.getElementById("type").addEventListener("change",(ev)=>{
         type = ev.target.selectedIndex;
