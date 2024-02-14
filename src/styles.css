@@ -7,6 +7,9 @@
 
 canvas {
     border: 1px solid black; /* Canvasの境界線を追加する場合 */
+    width: 80%; /* 80%の幅を設定 */
+    max-width: 500px; /* 最大幅を500pxに制限 */
+    height: auto; /* 高さは自動調整 */
 }
 
 .controller {
