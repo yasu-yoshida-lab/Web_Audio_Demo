@@ -30,7 +30,8 @@ window.addEventListener("load", async ()=>{
     });
     document.getElementById("stop").addEventListener("click",()=>{
         if(oscillator) {
-            oscillator.stop();
+            gain.gain.exponentialRampToValueAtTime(0.001, audioctx.currentTime + 0.5);
+            oscillator.stop(audioctx.currentTime + 0.5);
         }
         oscillator = null;
     });
