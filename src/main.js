@@ -24,8 +24,6 @@ window.addEventListener("load", async ()=>{
             oscillator.connect(gain).connect(analyser).connect(audioctx.destination);
             oscillator.start();
             isPlaying = true;
-            console.log(fftsizes[fftsizeindex]);
-
         }
     });
     document.getElementById("stop").addEventListener("click",()=>{
